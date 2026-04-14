@@ -1,0 +1,125 @@
+{
+  // ═══════════════════════════════════════════════════════════
+  // OpenClaw Windows Agent - Configuración REAL probada
+  // Basada en: Windows 11 25H2 + 8 GB RAM + Claude API
+  // Versión OpenClaw: 2026.4.11 (769908e)
+  // Ubicación: ~/.openclaw/openclaw.json
+  // ═══════════════════════════════════════════════════════════
+
+  "agents": {
+    "defaults": {
+      // IMPORTANTE: Usar ruta absoluta de Windows con doble backslash
+      "workspace": "C:\\Users\\TU_USUARIO\\.openclaw\\workspace",
+      "model": "anthropic/claude-3-haiku-20240307"
+    },
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "model": "anthropic/claude-3-haiku-20240307"
+      }
+    ]
+  },
+
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      // Genera con: openclaw doctor --generate-gateway-token
+      "token": "TU_TOKEN_GATEWAY_SEGURO"
+    },
+    "port": 18789,
+    // "lan" = accesible desde red local
+    // "loopback" = solo localhost (más seguro)
+    "bind": "lan",
+    "http": {
+      "endpoints": {
+        "chatCompletions": {
+          "enabled": true
+        }
+      }
+    }
+  },
+
+  // La API key debe estar AQUÍ y TAMBIÉN en models.providers.anthropic.apiKey
+  // Ponerla solo en un lugar causa "Missing API key" en ciertos flujos
+  "env": {
+    "ANTHROPIC_API_KEY": "TU_API_KEY_DE_ANTHROPIC"
+  },
+
+  "models": {
+    "providers": {
+
+      // --- Claude API (Anthropic) - RECOMENDADO ---
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "apiKey": "TU_API_KEY_DE_ANTHROPIC",
+        "models": [
+          {
+            "id": "claude-3-haiku-20240307",
+            "name": "Claude Haiku",
+            "contextWindow": 200000,
+            "maxTokens": 4096,
+            "compat": {
+              // IMPORTANTE: supportsTools debe ser true
+              // Sin esto, Claude chatea pero NO ejecuta acciones
+              "supportsTools": true,
+              "supportsDeveloperRole": false
+            }
+          }
+        ]
+      }
+
+      // --- Ollama (Local) - SOLO si tienes 16+ GB RAM ---
+      // Descomenta el bloque siguiente si quieres usar Ollama
+      //
+      // ⚠️ CON 8 GB RAM: Ollama causa timeout constante
+      //    Recomendación: usar solo Claude API
+      //
+      // "ollama": {
+      //   "baseUrl": "http://localhost:11434",   // SIN /v1
+      //   "apiKey": "ollama-local",
+      //   "api": "ollama",
+      //   "models": [
+      //     {
+      //       "id": "qwen2.5:3b",
+      //       "name": "Qwen 2.5 3B (Local)",
+      //       "contextWindow": 65536,
+      //       "maxTokens": 4096,
+      //       "compat": {
+      //         "supportsTools": true
+      //       }
+      //     }
+      //   ]
+      // }
+    }
+  },
+
+  // --- HERRAMIENTAS --- SECCIÓN CRÍTICA ---
+  // "full" = control total del PC (obligatorio para que funcione)
+  // "coding" = solo archivos y ejecución
+  // "messaging" = solo chat
+  // "minimal" = nada útil
+  "tools": {
+    "profile": "full",
+    "exec": {
+      // "full" = ejecuta cualquier comando sin restricción
+      "security": "full",
+      // "off" = no pide confirmación (necesario para Telegram)
+      "ask": "off"
+    }
+  },
+
+  // --- Canal de Telegram ---
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      // Token de @BotFather
+      "botToken": "TU_BOT_TOKEN_DE_TELEGRAM",
+      // "pairing" = nuevos usuarios necesitan aprobación
+      "dmPolicy": "pairing",
+      // Tu ID numérico de Telegram (obtener con @userinfobot)
+      "allowFrom": ["TU_ID_NUMERICO_TELEGRAM"]
+    }
+  }
+}
